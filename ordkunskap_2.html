@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ordkunskap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#F7F5F0;--surface:#FFFFFF;--border:#E4E0D8;--text:#1A1814;--muted:#8A8478;
+    --accent:#2C5F2E;--accent-light:#EAF0EA;
+    --red:#8B2020;--red-light:#F5EAEA;
+    --g1:#C8DDB0;--g1t:#2D5016;--g2:#6A9E45;--g2t:#1E3A0F;--g3:#2C5F2E;--g3t:#E8F2E8;
+    --r:12px;--rs:8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem 3rem;}
+  header{width:100%;max-width:480px;display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;}
+  .logo{font-family:'Lora',serif;font-size:1.25rem;font-weight:600;letter-spacing:-0.02em;}
+  .nav{display:flex;gap:4px;background:var(--border);border-radius:999px;padding:3px;}
+  .nav-btn{padding:5px 14px;border-radius:999px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;transition:all .15s;}
+  .nav-btn.active{background:var(--surface);color:var(--text);font-weight:500;}
+  .main{width:100%;max-width:480px;}
+  .screen{display:none;}.screen.active{display:block;}
+  .setup-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:2rem 1.5rem;text-align:center;}
+  .setup-card h2{font-family:'Lora',serif;font-size:1.3rem;margin-bottom:.5rem;}
+  .setup-card p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:1.25rem;}
+  .setup-card a{color:var(--accent);}
+  .api-input{width:100%;padding:.75rem 1rem;border:1px solid var(--border);border-radius:var(--rs);font-family:'DM Sans',sans-serif;font-size:14px;background:var(--bg);color:var(--text);margin-bottom:.75rem;outline:none;transition:border-color .15s;}
+  .api-input:focus{border-color:var(--accent);}
+  .word-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:2.5rem 1.5rem 2rem;text-align:center;margin-bottom:1rem;}
+  .rep-badge{display:inline-block;font-size:11px;background:var(--accent-light);color:var(--accent);border-radius:999px;padding:2px 10px;margin-bottom:.75rem;font-weight:500;}
+  .the-word{font-family:'Lora',serif;font-size:2.5rem;font-weight:600;letter-spacing:-0.03em;margin-bottom:.4rem;}
+  .word-hint{font-size:13px;color:var(--muted);line-height:1.6;}
+  textarea{width:100%;min-height:90px;padding:.85rem 1rem;border:1px solid var(--border);border-radius:var(--rs);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;background:var(--surface);color:var(--text);resize:none;outline:none;transition:border-color .15s;margin-bottom:.75rem;}
+  textarea:focus{border-color:var(--accent);}
+  .btn-row{display:flex;gap:8px;margin-bottom:.75rem;}
+  .btn{flex:1;padding:12px;border-radius:var(--rs);border:1px solid var(--border);background:var(--surface);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--text);cursor:pointer;transition:all .15s;}
+  .btn:active{transform:scale(.98);}
+  .btn.skip{flex:.5;color:var(--muted);font-weight:400;}
+  .btn.primary{background:var(--text);color:var(--bg);border-color:var(--text);}
+  .explain-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:.75rem;}
+  .explain-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;font-weight:500;}
+  .explain-main{font-size:14px;line-height:1.6;color:var(--text);margin-bottom:4px;}
+  .explain-syn{font-size:12px;color:var(--muted);margin-bottom:8px;}
+  .explain-ex{font-size:12px;color:var(--muted);font-style:italic;line-height:1.7;}
+  .explain-langs{font-size:12px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+  .iv-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:.4rem;}
+  .iv-cell{font-size:10px;text-align:center;color:var(--muted);}
+  .score-label{font-size:12px;color:var(--muted);text-align:center;margin-bottom:.5rem;}
+  .score-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:.75rem;}
+  .score-btn{padding:11px 4px;border-radius:var(--rs);border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;}
+  .score-btn:active{transform:scale(.97);}
+  .s1{background:var(--red-light);color:var(--red);}
+  .s2{background:var(--g1);color:var(--g1t);}
+  .s3{background:var(--g2);color:var(--g2t);}
+  .s4{background:var(--g3);color:var(--g3t);}
+  .end-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:3rem 1.5rem;text-align:center;margin-bottom:1rem;}
+  .end-num{font-family:'Lora',serif;font-size:4rem;font-weight:600;letter-spacing:-0.04em;}
+  .end-sub{font-size:14px;color:var(--muted);margin-bottom:2rem;}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem;}
+  .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:1rem;}
+  .stat-label{font-size:12px;color:var(--muted);margin-bottom:4px;}
+  .stat-val{font-family:'Lora',serif;font-size:1.75rem;font-weight:600;}
+  .sec-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500;margin-bottom:.6rem;}
+  .word-list{display:flex;flex-direction:column;gap:6px;margin-bottom:1.5rem;}
+  .word-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:.6rem 1rem;font-size:13px;display:flex;justify-content:space-between;align-items:center;}
+  .word-tag{font-size:11px;background:var(--accent-light);color:var(--accent);border-radius:999px;padding:2px 8px;}
+  .empty{text-align:center;padding:2rem;font-size:13px;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);}
+  .api-footer{margin-top:1.5rem;text-align:center;font-size:12px;color:var(--muted);}
+  .api-footer a{color:var(--muted);cursor:pointer;text-decoration:underline;}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Ordkunskap</div>
+  <div class="nav">
+    <button class="nav-btn active" id="nav-play" onclick="showScreen('play')">Spela</button>
+    <button class="nav-btn" id="nav-stats" onclick="showScreen('stats')">Statistik</button>
+  </div>
+</header>
+<div class="main">
+  <div id="screen-setup" class="screen active">
+    <div class="setup-card">
+      <h2>Välkommen</h2>
+      <p>Ange din Anthropic API-nyckel för AI-rättning. Sparas lokalt i din webbläsare.<br><br>Hämta nyckel på <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+      <input type="password" class="api-input" id="api-key-input" placeholder="sk-ant-..."/>
+      <button class="btn primary" style="width:100%" onclick="saveApiKey()">Starta spelet</button>
+    </div>
+  </div>
+
+  <div id="screen-play" class="screen">
+    <div id="phase-question">
+      <div class="word-card">
+        <div id="rep-badge" class="rep-badge" style="display:none">Repetition</div>
+        <div class="the-word" id="cur-word">—</div>
+        <div class="word-hint">Förklara vad ordet betyder</div>
+      </div>
+      <textarea id="user-answer" placeholder="Skriv din förklaring här..."></textarea>
+      <div class="btn-row">
+        <button class="btn skip" onclick="skipWord()">Hoppa</button>
+        <button class="btn primary" onclick="submitAnswer()">Skicka svar</button>
+      </div>
+    </div>
+
+    <div id="phase-feedback" style="display:none">
+      <div class="word-card">
+        <div class="the-word" id="fb-word">—</div>
+        <div class="word-hint" id="fb-hint" style="margin-top:.5rem;"></div>
+      </div>
+      <div class="explain-card">
+        <div class="explain-label">Fullständig förklaring</div>
+        <div class="explain-main" id="ex-sv"></div>
+        <div class="explain-syn" id="ex-syn"></div>
+        <div class="explain-ex" id="ex-ex"></div>
+        <div class="explain-langs" id="ex-langs"></div>
+      </div>
+      <div class="iv-row" id="iv-row"></div>
+      <div class="score-label">Hur gick det?</div>
+      <div class="score-row">
+        <button class="score-btn s1" onclick="registerScore(1)">Fel</button>
+        <button class="score-btn s2" onclick="registerScore(2)">Delvis</button>
+        <button class="score-btn s3" onclick="registerScore(3)">Bra</button>
+        <button class="score-btn s4" onclick="registerScore(4)">Perfekt</button>
+      </div>
+    </div>
+
+    <div id="phase-end" style="display:none">
+      <div class="end-card">
+        <div class="end-num" id="end-score">—</div>
+        <div class="end-sub">ord den här omgången</div>
+        <button class="btn primary" onclick="startSession()">Ny omgång</button>
+      </div>
+    </div>
+    <div class="api-footer"><a onclick="resetApiKey()">Byt API-nyckel</a></div>
+  </div>
+
+  <div id="screen-stats" class="screen">
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-label">Inlärda ord</div><div class="stat-val" id="s-learned">0</div></div>
+      <div class="stat-box"><div class="stat-label">Omgångar</div><div class="stat-val" id="s-sessions">0</div></div>
+      <div class="stat-box"><div class="stat-label">Vända kort</div><div class="stat-val" id="s-flipped">0</div></div>
+      <div class="stat-box"><div class="stat-label">Bästa streak</div><div class="stat-val" id="s-streak">0</div></div>
+    </div>
+    <div class="sec-title">Inlärda ord</div>
+    <div id="mastered-list" class="word-list"></div>
+  </div>
+</div>
+
+<script>
+const WORDS=[
+{id:'w1',word:'förträfflig',sv:'Utmärkt och av yppersta slag — används när något överstiger det normalt förväntade. Bär högtidlighet, passar bättre i skrift.',syn:'≈ Enastående, suverän, ypperlig',ex:['Det var en förträfflig middag.','Hon är en förträfflig lärare.','Resultatet blev förträffligt.'],en:'Excellent / outstanding',pl:'Doskonały / znakomity'},
+{id:'w2',word:'vederhäftig',sv:'Trovärdig, pålitlig och väl underbyggd — man kan lita på det som sägs för att det bygger på fakta.',syn:'≈ Tillförlitlig, trovärdig, seriös',ex:['En vederhäftig källa.','Hans redogörelse var vederhäftig.','Journalisten kontrollerar vederhäftiga fakta.'],en:'Credible / reliable',pl:'Wiarygodny / rzetelny'},
+{id:'w3',word:'motstridig',sv:'När saker säger emot varandra och inte kan stämma samtidigt.',syn:'≈ Motsägelsefull, oförenlig, inkonsekvent',ex:['Vittnesmålen var motstridiga.','Han hade motstridiga känslor.','Rapporten innehåller motstridiga uppgifter.'],en:'Contradictory / conflicting',pl:'Sprzeczny / niezgodny'},
+{id:'w4',word:'reciprok',sv:'Ömsesidig och symmetrisk — gäller i båda riktningar. Används i formella och matematiska sammanhang.',syn:'≈ Ömsesidig, bilateral, symmetrisk',ex:['Ett reciprokt handelsavtal.','Kärlek är mer meningsfull när den är reciprok.','Matematiken använder reciproka värden (1/x).'],en:'Reciprocal / mutual',pl:'Wzajemny / obustronny'},
+{id:'w5',word:'egendomlig',sv:'Märklig och avvikande från det normala utan att vara direkt skrämmande. Starkare än konstig, mjukare än bisarr.',syn:'≈ Underlig, sällsam, besynnerlig',ex:['En egendomlig känsla.','Hon hade ett egendomligt sätt att skratta.','En egendomlig händelse inträffade.'],en:'Strange / peculiar',pl:'Dziwny / osobliwy'},
+{id:'w6',word:'obeveklig',sv:'Absolut orubblig — låter sig inte påverkas, mjukas upp eller stoppas.',syn:'≈ Orubblig, kompromisslös, hänsynslös',ex:['Han var obeveklig i sin vägran.','Tidens gång är obeveklig.','Den obevekliga domaren lät sig inte blidkas.'],en:'Relentless / inexorable',pl:'Nieugięty / bezlitosny'},
+{id:'w7',word:'svårmod',sv:'Djup, tyst och ihållande känsla av vemod — mer poetisk än depression. Handlar om ett inre tungsinne.',syn:'≈ Melankoli, vemod, tungsinne',ex:['Svårmod lade sig över honom på hösten.','Hennes musik genomsyrades av ett skönt svårmod.','Han försökte skaka av sig svårmodet.'],en:'Melancholy / gloom',pl:'Melancholia / przygnębienie'},
+{id:'w8',word:'förtegen',sv:'Avsiktligt tystlåten — avslöjar inte mer än nödvändigt, av försiktighet eller hemlighetsmakeri.',syn:'≈ Hemlighetsfull, reserverad, sluten',ex:['Hon var förtegen om sin bakgrund.','Han förblev förtegen under förhöret.','En förtegen diplomat avslöjar inga planer.'],en:'Reticent / tight-lipped',pl:'Małomówny / skryty'},
+{id:'w9',word:'inbillsk',sv:'Uppblåst och ogrundad uppfattning om sig själv. Starkare och mer negativt än självsäker.',syn:'≈ Högdragen, självgod, fåfäng',ex:['Han var inbillsk och lyssnade aldrig.','En inbillsk person tar sällan hänsyn.','Hennes inbillska attityd stötte bort folk.'],en:'Conceited / vain',pl:'Zarozumiały / próżny'},
+{id:'w10',word:'försynt',sv:'Blygsam, varsam och respektfull — tar inte för sig mer än nödvändigt, undviker att störa.',syn:'≈ Återhållsam, anspråkslös, diskret',ex:['Han ställde frågan försynt.','Hon knackade försynt på dörren.','En försynt kommentar kan vara mer effektiv.'],en:'Modest / discreet',pl:'Skromny / delikatny'},
+{id:'w11',word:'ominös',sv:'Ger stark känsla av att något dåligt är på väg — hotfull stämning som hänger i luften.',syn:'≈ Olycksbådande, illavarslande, hotfull',ex:['En ominös tystnad föll över rummet.','Det ominösa molnet varslade om storm.','Hans leende var ominöst.'],en:'Ominous / foreboding',pl:'Złowieszczy / groźny'},
+{id:'w12',word:'sinnelag',sv:'Den djupare, stabila grunden i en persons karaktär — hur man förhåller sig till andra och världen.',syn:'≈ Naturell, läggning, mentalitet',ex:['Han har ett generöst sinnelag.','Hennes sinnelag är optimistiskt.','Det krävs ett tålmodigt sinnelag.'],en:'Disposition / temperament',pl:'Usposobienie / charakter'},
+{id:'w13',word:'arrogera',sv:'Ta sig rätten till något utan befogenhet — en makthandling utan legitimitet.',syn:'≈ Usurpera, tillägna sig, bemäktiga sig',ex:['Generalen arrogerade sig statsmakten.','Han arrogerade sig rätten att tala.','Ingen kan arrogera sig sådana befogenheter.'],en:'To arrogate / usurp',pl:'Uzurpować sobie'},
+{id:'w14',word:'tillnyktring',sv:'Bli nykter igen — bokstavligt eller bildligt om uppvaknande från illusion.',syn:'≈ Ernyktrande, desillusionering, uppvaknande',ex:['En politisk tillnyktring efter krisen.','Tillnyktringens tystnad kom efter festen.','Samhällets tillnyktring efter kriget.'],en:'Sobering up / disillusionment',pl:'Otrzeźwienie / rozczarowanie'},
+{id:'w15',word:'reciprocitet',sv:'Principen om ömsesidighet — förmåner och skyldigheter ska gå i båda riktningar.',syn:'≈ Ömsesidighet, jämvikt, symmetri',ex:['Diplomatin bygger på reciprocitet.','Det saknas reciprocitet i relationen.','Avtalet garanterar reciprocitet.'],en:'Reciprocity',pl:'Wzajemność'},
+{id:'w16',word:'ambivalent',sv:'Att samtidigt hysa motsatta känslor om något. Man är kluven — varken helt för eller emot.',syn:'≈ Kluven, tvehågsen, vacklande',ex:['Hon var ambivalent inför erbjudandet.','Han kände en ambivalent glädje.','Ambivalenta känslor är vanliga i komplexa relationer.'],en:'Ambivalent',pl:'Ambiwalentny'},
+{id:'w17',word:'autonomi',sv:'Rätten eller förmågan att styra sig själv utan yttre inblandning.',syn:'≈ Självständighet, oberoende, självbestämmande',ex:['Regionen krävde större autonomi.','Barnet behöver autonomi för att växa.','Autonomi är centralt i medicinsk etik.'],en:'Autonomy',pl:'Autonomia'},
+{id:'w18',word:'retorik',sv:'Konsten att tala eller skriva övertygande. Kan också syfta på tomma ord utan substans.',syn:'≈ Vältalighet, argumentation, fraser',ex:['Hans retorik imponerade på publiken.','Politikerns retorik var substanslös.','Retoriken dolde avsaknaden av förslag.'],en:'Rhetoric',pl:'Retoryka'},
+{id:'w19',word:'kognitiv',sv:'Som rör tankeprocesser, minne, inlärning och perception — hjärnans informationsbearbetning.',syn:'≈ Intellektuell, mental, tankemässig',ex:['Kognitiv förmåga mäts med IQ-tester.','Den kognitiva belastningen var hög.','Kognitiv dissonans uppstår vid motstridiga övertygelser.'],en:'Cognitive',pl:'Kognitywny'},
+{id:'w20',word:'konsensus',sv:'Allmän enighet i en grupp — ett gemensamt beslut utan formell omröstning.',syn:'≈ Samstämmighet, enighet, överenskommelse',ex:['Gruppen nådde konsensus efter diskussioner.','Det råder konsensus om klimatförändringarnas orsaker.','Beslut togs i konsensus.'],en:'Consensus',pl:'Konsensus'},
+{id:'w21',word:'pragmatisk',sv:'Fokuserar på vad som fungerar i praktiken snarare än på principer eller teorier.',syn:'≈ Praktisk, realistisk, handlingsorienterad',ex:['En pragmatisk lösning på problemet.','Hon är pragmatisk — hon gör vad som krävs.','Pragmatiskt tänkande värderas i affärslivet.'],en:'Pragmatic',pl:'Pragmatyczny'},
+{id:'w22',word:'paradox',sv:'Ett påstående som verkar självmotsägande men kan innehålla en sanning.',syn:'≈ Motsägelse, gåta, ironi',ex:['Det är en paradox att mer frihet kan skapa ångest.','Han levde med paradoxen att älska ensamheten.','Paradoxen är skenbar, inte verklig.'],en:'Paradox',pl:'Paradoks'},
+{id:'w23',word:'subjektiv',sv:'Grundad i personlig upplevelse eller känsla — inte objektivt mätbar.',syn:'≈ Personlig, individuell, godtycklig',ex:['Skönhet är subjektiv.','Hans bedömning var alltför subjektiv.','Subjektiva upplevelser är svåra att mäta.'],en:'Subjective',pl:'Subiektywny'},
+{id:'w24',word:'objektiv',sv:'Baserad på fakta, oberoende av personliga känslor eller åsikter.',syn:'≈ Neutral, opartisk, saklig',ex:['En objektiv analys av situationen.','Han försökte vara objektiv.','Objektiv rapportering är journalistikens ideal.'],en:'Objective',pl:'Obiektywny'},
+{id:'w25',word:'imperativ',sv:'Absolut nödvändigt och ofrånkomligt. Också grammatisk term för befallningsform.',syn:'≈ Nödvändigt, tvingande, oundvikligt',ex:['Det är ett moraliskt imperativ att hjälpa.','Förändring är imperativ för överlevnad.','Handla nu — det är imperativt.'],en:'Imperative',pl:'Imperatyw'},
+{id:'w26',word:'subtil',sv:'Svår att uppfatta, känslig och raffinerad — kräver uppmärksamhet för att märkas.',syn:'≈ Fin, försiktig, nyanserad',ex:['En subtil förändring i hennes tonfall.','Subtilt humor är svårt att översätta.','Han använde subtil manipulation.'],en:'Subtle',pl:'Subtelny'},
+{id:'w27',word:'tendens',sv:'En benägenhet att röra sig i en viss riktning eller upprepat beteende.',syn:'≈ Benägenhet, dragning, trend',ex:['Han har en tendens att överdriva.','Det finns en tendens till urbanisering.','Tendensen syns tydligt i statistiken.'],en:'Tendency / trend',pl:'Tendencja'},
+{id:'w28',word:'konsekvens',sv:'Det som följer av en handling eller händelse.',syn:'≈ Följd, resultat, effekt',ex:['Handlingens konsekvenser var allvarliga.','Tänk på konsekvenserna.','Utan konsekvenser lär man sig ingenting.'],en:'Consequence',pl:'Konsekwencja'},
+{id:'w29',word:'abstrakt',sv:'Existerar som idé snarare än konkret fysisk verklighet — svår att ta på.',syn:'≈ Teoretisk, ogripbar, begreppsmässig',ex:['Frihet är ett abstrakt begrepp.','Konsten blev alltmer abstrakt.','Abstrakta idéer kräver konkreta exempel.'],en:'Abstract',pl:'Abstrakcyjny'},
+{id:'w30',word:'explicit',sv:'Tydligt och direkt uttryckt — inget lämnas åt tolkning.',syn:'≈ Uttrycklig, tydlig, direkt',ex:['Han gav explicita instruktioner.','Kontraktet är explicit om villkoren.','Explicit kommunikation minskar missförstånd.'],en:'Explicit',pl:'Eksplicytny'},
+{id:'w31',word:'implicit',sv:'Underförstått och inte direkt uttryckt — finns där utan att sägas.',syn:'≈ Underförstådd, indirekt, dold',ex:['Det finns ett implicit hot i hans ord.','Implicita förväntningar skapar konflikt.','Hennes tystnad var ett implicit godkännande.'],en:'Implicit',pl:'Implicytny'},
+{id:'w32',word:'kontext',sv:'Det sammanhang i vilket något sker eller sägs — avgör ofta tolkningen.',syn:'≈ Sammanhang, bakgrund, omgivning',ex:['Orden måste förstås i sin kontext.','Utan kontext är citatet missvisande.','Historisk kontext är avgörande.'],en:'Context',pl:'Kontekst'},
+{id:'w33',word:'manifestera',sv:'Göra synlig eller påtaglig — låta något visa sig i konkret form.',syn:'≈ Visa, uppenbara, yttra sig',ex:['Stressen manifesterade sig som huvudvärk.','Idén manifesterades i ett konstverk.','Förändringen manifesterade sig långsamt.'],en:'To manifest',pl:'Manifestować'},
+{id:'w34',word:'polarisering',sv:'Process där åsikter eller grupper rör sig mot extrema motpoler.',syn:'≈ Splittring, uppdelning, extremisering',ex:['Den politiska polariseringen ökar.','Sociala medier bidrar till polarisering.','Polarisering gör kompromisser omöjliga.'],en:'Polarization',pl:'Polaryzacja'},
+{id:'w35',word:'normativ',sv:'Handlar om hur något bör vara — anger normer eller regler.',syn:'≈ Föreskrivande, värderande, moralisk',ex:['Normativa påståenden är svåra att bevisa.','En normativ teori om rättvisa.','Lagen är normativ till sin natur.'],en:'Normative',pl:'Normatywny'},
+{id:'w36',word:'empirisk',sv:'Baserad på observation och experiment snarare än teori.',syn:'≈ Erfarenhetsbaserad, vetenskaplig, mätbar',ex:['Empiriska studier stödjer hypotesen.','Vi behöver empiriska bevis.','Empirisk forskning är grunden för medicin.'],en:'Empirical',pl:'Empiryczny'},
+{id:'w37',word:'hypotes',sv:'Ett antagande som ska testas — en preliminär förklaring som ännu inte bevisats.',syn:'≈ Antagande, teori, förslag',ex:['Forskaren formulerade en hypotes.','Hypotesen bekräftades av experimenten.','En hypotes utan bevis är bara spekulation.'],en:'Hypothesis',pl:'Hipoteza'},
+{id:'w38',word:'konsekvent',sv:'Handlar enligt samma principer genomgående — utan att göra undantag.',syn:'≈ Enhetlig, sammanhängande, uthållig',ex:['Hon är konsekvent i sin politik.','Konsekvent träning ger resultat.','Hans beteende var inkonsekvent.'],en:'Consistent',pl:'Konsekwentny'},
+{id:'w39',word:'legitimitet',sv:'Rättmätighet och acceptans — att något erkänns som giltigt och berättigat.',syn:'≈ Rättmätighet, giltighet, befogenhet',ex:['Regeringens legitimitet ifrågasattes.','Valet gav ledaren ny legitimitet.','Utan folkligt stöd saknar makten legitimitet.'],en:'Legitimacy',pl:'Legitymizacja'},
+{id:'w40',word:'integritet',sv:'Ärlighet och moralisk fasthet — att handla i linje med sina värderingar.',syn:'≈ Hederlighet, ärlighet, karaktär',ex:['Han offrade aldrig sin integritet.','Integritet är en förutsättning för förtroende.','Hennes integritet var orubblig.'],en:'Integrity',pl:'Integralność / uczciwość'},
+{id:'w41',word:'resiliens',sv:'Förmågan att återhämta sig från svårigheter och motgångar.',syn:'≈ Motståndskraft, återhämtningsförmåga, seghet',ex:['Barnet visade stor resiliens efter förlusten.','Resiliens är viktigt i krislägen.','Samhällets resiliens testades av pandemin.'],en:'Resilience',pl:'Odporność'},
+{id:'w42',word:'karisma',sv:'En magnetisk personlig utstrålning som drar till sig och påverkar andra.',syn:'≈ Utstrålning, charm, dragningskraft',ex:['Ledaren hade naturlig karisma.','Karisma kan inte läras ut.','Hans karisma fyllde hela rummet.'],en:'Charisma',pl:'Charyzma'},
+{id:'w43',word:'empatisk',sv:'Förmögen att förstå och dela andras känslor och perspektiv.',syn:'≈ Inkännande, medkännande, lyhörd',ex:['En empatisk lärare förstår sina elever.','Empatisk kommunikation minskar konflikter.','Han är genuint empatisk.'],en:'Empathetic',pl:'Empatyczny'},
+{id:'w44',word:'stigma',sv:'Skam eller vanära kopplad till ett tillstånd, egenskap eller grupp.',syn:'≈ Skam, vanära, fördomar',ex:['Det finns ett stigma kring psykisk ohälsa.','Stigmat hindrar folk från att söka hjälp.','Stigmat har minskat med ökad öppenhet.'],en:'Stigma',pl:'Piętno / stygmat'},
+{id:'w45',word:'koherent',sv:'Sammanhängande och logiskt konsekvent — delarna hänger ihop.',syn:'≈ Sammanhängande, logisk, enhetlig',ex:['En koherent argumentation.','Hans berättelse var inte koherent.','En koherent strategi kräver tydliga mål.'],en:'Coherent',pl:'Koherentny / spójny'},
+{id:'w46',word:'dogmatisk',sv:'Håller stelbent fast vid doktriner utan att vilja ifrågasätta dem.',syn:'≈ Trångsynt, stel, fanatisk',ex:['En dogmatisk inställning till vetenskap.','Han var dogmatisk i sin tro.','Dogmatiskt tänkande hindrar innovation.'],en:'Dogmatic',pl:'Dogmatyczny'},
+{id:'w47',word:'latent',sv:'Finns där men är dold eller inte aktiv — kan aktiveras under rätt förhållanden.',syn:'≈ Dold, sovande, potentiell',ex:['En latent talang.','Latent konflikt i gruppen.','Viruset kan förbli latent i kroppen.'],en:'Latent',pl:'Latentny / ukryty'},
+{id:'w48',word:'konnotation',sv:'De associationer och känslor ett ord för med sig utöver sin bokstavliga betydelse.',syn:'≈ Bibetydelse, association, undertext',ex:['"Hem" har positiva konnotationer.','Ordet har negativa konnotationer.','Konnotationer varierar mellan kulturer.'],en:'Connotation',pl:'Konotacja'},
+{id:'w49',word:'dikotomi',sv:'Uppdelning i två ömsesidigt uteslutande kategorier.',syn:'≈ Tvådelning, motsatspar, antites',ex:['Den falska dikotomin mellan frihet och säkerhet.','Dikotomin bra/dålig är förenklad.','Filosofin ifrågasätter dikotomin kropp/själ.'],en:'Dichotomy',pl:'Dychotomia'},
+{id:'w50',word:'axiom',sv:'Ett grundläggande påstående som antas sant utan bevis — en startpunkt för resonemang.',syn:'≈ Grundsats, självklarhet, premiss',ex:['I geometrin är parallella linjer ett axiom.','Argumentet byggde på felaktiga axiom.','Axiom ifrågasätts sällan i vardagslivet.'],en:'Axiom',pl:'Aksjomat'},
+{id:'w51',word:'analogi',sv:'En jämförelse som belyser likheten mellan två annars olika saker.',syn:'≈ Likelse, jämförelse, parallell',ex:['Han förklarade med en analogi till vatten.','En analogi hjälper att förstå abstrakta begrepp.','Analogin haltade på en punkt.'],en:'Analogy',pl:'Analogia'},
+{id:'w52',word:'korrelation',sv:'Statistiskt samband mellan två variabler — de förändras tillsammans, men det bevisar inte orsakssamband.',syn:'≈ Samband, samvariation',ex:['Korrelation mellan utbildning och inkomst.','Korrelation är inte detsamma som kausalitet.','En negativ korrelation innebär motsatt rörelse.'],en:'Correlation',pl:'Korelacja'},
+{id:'w53',word:'kausalitet',sv:'Orsak-verkan-förhållande — att A faktiskt orsakar B.',syn:'≈ Orsakssamband, orsak och verkan',ex:['Kausalitet är svårare att bevisa än korrelation.','Rökning och cancer: korrelation och kausalitet.','Att bevisa kausalitet kräver kontrollerade experiment.'],en:'Causality',pl:'Przyczynowość'},
+{id:'w54',word:'syntes',sv:'Sammanslagning av olika element till en ny helhet — kombination av tes och antites.',syn:'≈ Sammansmältning, integration, helhet',ex:['Syntesen av de två teorierna var banbrytande.','Uppsatsen är en syntes av flera perspektiv.','Hegelansk syntes löser motsättningen.'],en:'Synthesis',pl:'Synteza'},
+{id:'w55',word:'hegemoni',sv:'Dominans och ledarskap av en grupp, stat eller idé över andra — ofta utan direkt tvång.',syn:'≈ Dominans, överhöghet, inflytande',ex:['USA:s kulturella hegemoni är global.','Hegemonin utmanas av framväxande makter.','Gramsci analyserade kulturell hegemoni.'],en:'Hegemony',pl:'Hegemonia'},
+{id:'w56',word:'diskurs',sv:'Det sätt på vilket ett ämne talas om och definieras i ett samhälle — inkluderar maktstrukturer.',syn:'≈ Samtal, debatt, tankemönster',ex:['Den politiska diskursen har hårdnat.','Feministisk diskurs utmanar patriarkala normer.','Foucault analyserade vetenskaplig diskurs.'],en:'Discourse',pl:'Dyskurs'},
+{id:'w57',word:'paradigm',sv:'En dominerande ram eller modell som styr hur man tänker inom ett område.',syn:'≈ Modell, tankeram, referensram',ex:['Ett paradigmskifte i fysiken.','Det rådande paradigmet ifrågasattes.','Kuhn beskrev hur paradigm förändras.'],en:'Paradigm',pl:'Paradygmat'},
+{id:'w58',word:'alienation',sv:'Känslan av att vara avskild från sig själv, andra eller samhället.',syn:'≈ Främlingskap, isolering, avskildhet',ex:['Marx skrev om arbetarens alienation.','Urban alienation är ett modernt fenomen.','Hon kände en djup alienation.'],en:'Alienation',pl:'Alienacja'},
+{id:'w59',word:'narrativ',sv:'En berättelse eller tolkningsram som ger mening åt händelser.',syn:'≈ Berättelse, berättarram, tolkningsmodell',ex:['Det politiska narrativet förändrades.','Vinnarna skriver historiens narrativ.','Terapeuten hjälpte henne ändra sitt narrativ.'],en:'Narrative',pl:'Narracja'},
+{id:'w60',word:'kontrafaktisk',sv:'Handlar om vad som skulle ha hänt om något vore annorlunda — hypotetiska alternativ till verkligheten.',syn:'≈ Hypotetisk, alternativ, tänkt',ex:['Kontrafaktisk historia frågar "tänk om".','En kontrafaktisk analys av krigets utfall.','Kontrafaktiska resonemang används i ekonomi.'],en:'Counterfactual',pl:'Kontrfaktyczny'},
+{id:'w61',word:'instrumentell',sv:'Nyttig som medel för att nå ett mål — inte värdefullt i sig självt.',syn:'≈ Funktionell, medelstyrd, praktisk',ex:['Instrumentell rationalitet prioriterar effektivitet.','Han hade en instrumentell syn på relationer.','Pengar är instrumentella — inte ett mål i sig.'],en:'Instrumental',pl:'Instrumentalny'},
+{id:'w62',word:'praxis',sv:'Praktisk tillämpning av teori — den faktiska handlingen i motsats till teorin.',syn:'≈ Praktik, handling, tillämpning',ex:['Teorin omsatt i praxis visade sig problematisk.','Praxis skiljer sig ofta från ideal.','Marxistisk praxis syftade till samhällsförändring.'],en:'Praxis',pl:'Praxis / praktyka'},
+{id:'w63',word:'vehement',sv:'Intensiv, häftig och passionerad — uttryckt med stark kraft.',syn:'≈ Häftig, intensiv, passionerad',ex:['Han protesterade vehement.','En vehement förespråkare för rättvisa.','Hennes vehementa reaktion förvånade alla.'],en:'Vehement',pl:'Gwałtowny / żarliwy'},
+{id:'w64',word:'periferi',sv:'Utkanten eller ytterkanten av ett område — i motsats till centrum.',syn:'≈ Utkant, marginal, ytterkant',ex:['Händelserna utspelade sig i periferin.','Fattiga länder hamnar i global periferi.','Han levde i samhällets periferi.'],en:'Periphery',pl:'Peryferie'},
+{id:'w65',word:'ostentativ',sv:'Gjord för att synas och imponera — överdriven och skrytsam uppvisning.',syn:'≈ Skrytsam, prålig, demonstrativ',ex:['En ostentativ rikedomsuppvisning.','Han gjorde en ostentativ gest av välvilja.','Hennes ostentativa generositet väckte misstanke.'],en:'Ostentatious',pl:'Ostentacyjny'},
+{id:'w66',word:'ambiguitet',sv:'Tvetydighet — kan tolkas på mer än ett sätt.',syn:'≈ Tvetydighet, oklarheten, mångtydighet',ex:['Lagens ambiguitet skapade tolkningsproblem.','Konstnärlig ambiguitet är ibland avsiktlig.','Ambiguiteten i hans svar var störande.'],en:'Ambiguity',pl:'Dwuznaczność'},
+{id:'w67',word:'intransigent',sv:'Vägrar kompromissa — håller stelbent fast vid sin ståndpunkt.',syn:'≈ Kompromisslös, orubblig, stel',ex:['Förhandlingarna bröt samman på grund av hans intransigenta hållning.','En intransigent politiker förlorar allt.','Hon var intransigent i frågan om rättvisa.'],en:'Intransigent',pl:'Nieustępliwy'},
+{id:'w68',word:'kontingent',sv:'Beroende av omständigheter — kunde ha blivit annorlunda, inte nödvändigt.',syn:'≈ Tillfällig, beroende, villkorad',ex:['Historien är kontingent — inget var oundvikligt.','Framgången var kontingent på externa faktorer.','Kontingent sanning gäller bara under vissa villkor.'],en:'Contingent',pl:'Kontyngentny / przypadkowy'},
+{id:'w69',word:'transcendent',sv:'Går bortom det normala eller materiella — överstiger gränser och kategorier.',syn:'≈ Översinnlig, gränsöverskridande, gudomlig',ex:['En transcendent upplevelse av enhet.','Religiösa upplevelser beskrivs som transcendenta.','Konstverket syftade till det transcendenta.'],en:'Transcendent',pl:'Transcendentny'},
+{id:'w70',word:'epistemologi',sv:'Läran om kunskap — hur vi vet vad vi vet och vad som räknas som kunskap.',syn:'≈ Kunskapsteori, vetenskapsteori',ex:['Epistemologi är en gren av filosofin.','Epistemologiska frågor rör kunskapens natur.','Vad är sanning? En epistemologisk fråga.'],en:'Epistemology',pl:'Epistemologia'},
+{id:'w71',word:'ontologi',sv:'Läran om varats natur — vad som finns och vad existens innebär.',syn:'≈ Varalära, existensfilosofi',ex:['Ontologin frågar: vad existerar egentligen?','Ontologiska antaganden påverkar all forskning.','Medvetandets ontologiska status debatteras.'],en:'Ontology',pl:'Ontologia'},
+{id:'w72',word:'dialektik',sv:'Metod att nå sanning genom dialog och konfrontation av motsatta ståndpunkter.',syn:'≈ Debatt, argument, motsatsernas syntes',ex:['Hegels dialektik: tes, antites, syntes.','Dialektiskt tänkande värdesätter konflikten.','Diskussionen var en produktiv dialektik.'],en:'Dialectic',pl:'Dialektyka'},
+{id:'w73',word:'tautologi',sv:'Ett påstående som är sant per definition — upprepning av samma sak med andra ord.',syn:'≈ Upprepning, självklarhet, cirkelargument',ex:['"Ogifta män är ungkarlar" är en tautologi.','Argumentet var en tautologi.','Undvik tautologier i akademiskt skrivande.'],en:'Tautology',pl:'Tautologia'},
+{id:'w74',word:'distinktion',sv:'En meningsfull skillnad mellan saker som annars kan verka likartade.',syn:'≈ Åtskillnad, skillnad, gräns',ex:['Distinktionen mellan form och innehåll.','Distinktionen är subtil men avgörande.','Juristen drog en skarp distinktion.'],en:'Distinction',pl:'Dystynkcja / rozróżnienie'},
+{id:'w75',word:'implikation',sv:'Vad som följer eller antyds av något — en konsekvens eller underförstått innehåll.',syn:'≈ Följd, antydan, innebörd',ex:['Implikationerna av beslutet är stora.','Vad är implikationen av din teori?','Implikationen av tystnad kan vara samtycke.'],en:'Implication',pl:'Implikacja'},
+{id:'w76',word:'reifikation',sv:'Att behandla abstrakta idéer eller relationer som om de vore konkreta ting.',syn:'≈ Tinggörande, förtingligande',ex:['Reifikation av begreppet marknaden.','Marx kritiserade kapitalismens reifikation av arbete.','Reifikation reducerar människor till objekt.'],en:'Reification',pl:'Reifikacja'},
+{id:'w77',word:'dekonstruktion',sv:'Att bryta ner en text eller idé för att avslöja dolda antaganden och motsägelser.',syn:'≈ Upplösning, kritisk analys, nedbrytning',ex:['Derrida är känd för sin dekonstruktion.','En dekonstruktion av begreppet manligt.','Dekonstruktionen avslöjade dolda maktstrukturer.'],en:'Deconstruction',pl:'Dekonstrukcja'},
+{id:'w78',word:'axiologisk',sv:'Som rör värden och värderingar — etikens och estetikens grunder.',syn:'≈ Värdebaserad, normativ',ex:['Axiologiska frågor handlar om vad som är gott.','En axiologisk analys av konstverket.','Axiologisk relativism hävdar att värden är kulturellt betingade.'],en:'Axiological',pl:'Aksjologiczny'},
+{id:'w79',word:'korollar',sv:'En slutsats som följer direkt från en annan utan ytterligare bevis.',syn:'≈ Följdsats, konsekvens, slutledning',ex:['Det är ett korollar till den tidigare teorin.','Jämlikheten är ett korollar till friheten.','Korollaret bevisas automatiskt av huvudsatsen.'],en:'Corollary',pl:'Wniosek / korolarium'},
+{id:'w80',word:'emanera',sv:'Utflöda eller utgå från en källa — sprida sig från ett ursprung.',syn:'≈ Utströmma, utgå, sprida sig',ex:['Värme emanerade från kaminen.','Auktoritet emanerar från folket.','Ljuset emanerade från fönstret.'],en:'To emanate',pl:'Emanować'},
+{id:'w81',word:'apologi',sv:'Ett försvar av en åsikt eller handling — inte nödvändigtvis en ursäkt.',syn:'≈ Försvar, rättfärdigande, plaidoyer',ex:['Boken är en apologi för liberalismen.','Han höll en apologi för sin politik.','Apologin övertygade ingen.'],en:'Apology / defence',pl:'Apologia'},
+{id:'w82',word:'polaritet',sv:'Förekomsten av två motsatta poler eller egenskaper.',syn:'≈ Motpoler, kontrast, tvådelning',ex:['Polariteten mellan tradition och modernitet.','Magnetens polaritet kan vändas.','Politikens polaritet förstärks av media.'],en:'Polarity',pl:'Polarność'},
+{id:'w83',word:'deduktiv',sv:'Drar slutsatser från allmänna principer till specifika fall — från det generella till det specifika.',syn:'≈ Slutledande, logisk, principbaserad',ex:['Deduktivt resonemang är grunden för matematik.','En deduktiv slutsats följer av premisserna.','Sherlock Holmes använder deduktiv metod.'],en:'Deductive',pl:'Dedukcyjny'},
+{id:'w84',word:'induktiv',sv:'Drar slutsatser från specifika observationer till generella principer.',syn:'≈ Erfarenhetsbaserad, generaliserande',ex:['Induktiv forskning börjar med observation.','Induktivt resonemang leder till hypoteser.','Naturvetenskapen är till stor del induktiv.'],en:'Inductive',pl:'Indukcyjny'},
+{id:'w85',word:'karismatisk',sv:'Som utstrålar en magnetisk personlig kraft som drar till sig och engagerar andra.',syn:'≈ Utstrålande, charmerande, inspirerande',ex:['En karismatisk ledare samlar folkmassor.','Hon höll ett karismatiskt tal.','Karismatiska personligheter är svåra att ignorera.'],en:'Charismatic',pl:'Charyzmatyczny'},
+];
+
+const DEFAULT_EASE=250,MIN_EASE=130,GRADUATING_INT=1,EASY_INT=4;
+const EASY_BONUS=1.3,HARD_FACTOR=1.2;
+const LEARN_STEPS=[1,10];
+const STORAGE_KEY='ordkunskap-sm2-v1';
+
+let state={progress:{},stats:{sessions:0,flipped:0,bestStreak:0},streak:0};
+let session=[],idx=0,sessionCorrect=0,apiKey='';
+
+function loadState(){
+  try{const s=localStorage.getItem(STORAGE_KEY);if(s)state=JSON.parse(s);apiKey=localStorage.getItem('ordkunskap-apikey')||'';}catch(e){}
+}
+function saveState(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}}
+function saveApiKey(){
+  const k=document.getElementById('api-key-input').value.trim();
+  if(!k.startsWith('sk-')){alert('Ange en giltig API-nyckel (börjar med sk-)');return;}
+  apiKey=k;localStorage.setItem('ordkunskap-apikey',k);showScreen('play');startSession();
+}
+function resetApiKey(){localStorage.removeItem('ordkunskap-apikey');apiKey='';showScreen('setup');}
+
+function getCard(id){return state.progress[id]||{ease:DEFAULT_EASE,interval:0,step:0,reviews:0};}
+
+function getNextIntervals(card){
+  const ease=card.ease||DEFAULT_EASE,interval=card.interval||0,step=card.step||0;
+  if(step<LEARN_STEPS.length){
+    return{
+      again:{v:LEARN_STEPS[0],u:'m'},
+      hard:{v:LEARN_STEPS[Math.min(step,LEARN_STEPS.length-1)],u:'m'},
+      good:step+1<LEARN_STEPS.length?{v:LEARN_STEPS[step+1],u:'m'}:{v:GRADUATING_INT,u:'d'},
+      easy:{v:EASY_INT,u:'d'}
+    };
+  }
+  const hi=Math.max(interval+1,Math.round(interval*HARD_FACTOR));
+  const gi=Math.max(hi+1,Math.round(interval*(ease/100)));
+  const ei=Math.max(gi+1,Math.round(interval*(ease/100)*EASY_BONUS));
+  return{again:{v:1,u:'d'},hard:{v:hi,u:'d'},good:{v:gi,u:'d'},easy:{v:ei,u:'d'}};
+}
+
+function fmtIv(iv){
+  if(iv.u==='m')return iv.v<60?iv.v+'m':Math.round(iv.v/60)+'h';
+  if(iv.v>=365)return Math.round(iv.v/365)+'å';
+  if(iv.v>=30)return Math.round(iv.v/30)+'mån';
+  return iv.v+'d';
+}
+
+function applyScore(card,score){
+  const ease=card.ease||DEFAULT_EASE,interval=card.interval||0,step=card.step||0;
+  if(score===1){card.step=0;card.interval=0;card.ease=Math.max(MIN_EASE,ease-20);card.nextReview=Date.now()+LEARN_STEPS[0]*60000;}
+  else if(step<LEARN_STEPS.length){
+    if(score===4){card.step=LEARN_STEPS.length;card.interval=EASY_INT;card.nextReview=Date.now()+EASY_INT*86400000;}
+    else{const ns=step+1;if(ns>=LEARN_STEPS.length){card.step=LEARN_STEPS.length;card.interval=GRADUATING_INT;card.nextReview=Date.now()+GRADUATING_INT*86400000;}else{card.step=ns;card.interval=0;card.nextReview=Date.now()+LEARN_STEPS[ns]*60000;}}
+  }else{
+    const ivs=getNextIntervals(card);
+    if(score===2){card.ease=Math.max(MIN_EASE,ease-15);card.interval=ivs.hard.v;}
+    else if(score===3){card.interval=ivs.good.v;}
+    else if(score===4){card.ease=Math.min(ease+15,400);card.interval=ivs.easy.v;}
+    card.nextReview=Date.now()+card.interval*86400000;
+  }
+  card.lastSeen=Date.now();card.reviews=(card.reviews||0)+1;return card;
+}
+
+function isDue(w){const p=state.progress[w.id];if(!p||!p.nextReview)return true;return Date.now()>=p.nextReview;}
+function isGraduated(w){const p=state.progress[w.id];return p&&(p.step||0)>=LEARN_STEPS.length&&(p.interval||0)>=GRADUATING_INT;}
+function isMastered(w){const p=state.progress[w.id];return p&&(p.step||0)>=LEARN_STEPS.length&&(p.interval||0)>=21;}
+
+function buildSession(){
+  const due=WORDS.filter(isDue).sort(()=>Math.random()-.5);
+  return due.length?due.slice(0,15):WORDS.sort(()=>Math.random()-.5).slice(0,15);
+}
+
+function startSession(){
+  session=buildSession();idx=0;sessionCorrect=0;state.stats.sessions++;
+  showPhase('question');showWord();saveState();
+}
+
+function showPhase(n){['question','feedback','end'].forEach(p=>document.getElementById('phase-'+p).style.display=p===n?'':'none');}
+
+function showWord(){
+  if(idx>=session.length){endSession();return;}
+  const w=session[idx];
+  document.getElementById('cur-word').textContent=w.word;
+  document.getElementById('rep-badge').style.display=isGraduated(w)?'inline-block':'none';
+  document.getElementById('user-answer').value='';
+  showPhase('question');
+  document.getElementById('user-answer').focus();
+}
+
+async function submitAnswer(){
+  const ans=document.getElementById('user-answer').value.trim();
+  if(!ans)return;
+  const w=session[idx];
+  state.stats.flipped++;
+  document.getElementById('fb-word').textContent=w.word;
+  document.getElementById('ex-sv').textContent=w.sv;
+  document.getElementById('ex-syn').textContent=w.syn;
+  document.getElementById('ex-ex').innerHTML=w.ex.join('<br>');
+  document.getElementById('ex-langs').textContent=w.en+' · '+w.pl;
+  const card=getCard(w.id);
+  const ivs=getNextIntervals(card);
+  document.getElementById('iv-row').innerHTML=`
+    <div class="iv-cell" style="color:var(--red)">Fel<br><b>${fmtIv(ivs.again)}</b></div>
+    <div class="iv-cell" style="color:var(--g1t)">Delvis<br><b>${fmtIv(ivs.hard)}</b></div>
+    <div class="iv-cell" style="color:var(--g2t)">Bra<br><b>${fmtIv(ivs.good)}</b></div>
+    <div class="iv-cell" style="color:var(--g3)">Perfekt<br><b>${fmtIv(ivs.easy)}</b></div>`;
+  document.getElementById('fb-hint').textContent='Läs rättningen — välj sedan betyg';
+  showPhase('feedback');
+  if(apiKey){
+    const prompt=`Du rättar svenska ordkunskapsövningar. Börja alltid med "Resultat: **[Fel / Delvis / Bra / Perfekt]**" på första raden. Betygsätt själv. Ge sedan den absolut bästa förklaringen anpassad efter elevens svar — vad stämde, vad saknades, ordets viktigaste nyans. Max 3 meningar. Inga hälsningar eller avslutningar.\n\nOrd: "${w.word}"\nBetydelse: ${w.sv}\nSynonymer: ${w.syn}\nElevens svar: "${ans}"`;
+    try{
+      const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:250,messages:[{role:'user',content:prompt}]})});
+      const data=await res.json();
+      if(!data.error){const t=data.content.map(c=>c.text||'').join('').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');document.getElementById('fb-hint').innerHTML=t;}
+    }catch(e){}
+  }
+  saveState();
+}
+
+function registerScore(score){
+  const w=session[idx];
+  state.progress[w.id]=applyScore(getCard(w.id),score);
+  if(score>=3){sessionCorrect++;state.streak=(state.streak||0)+1;}else{state.streak=0;}
+  if(state.streak>(state.stats.bestStreak||0))state.stats.bestStreak=state.streak;
+  saveState();idx++;showWord();
+}
+
+function skipWord(){idx++;showWord();}
+function endSession(){showPhase('end');document.getElementById('end-score').textContent=sessionCorrect+'/'+session.length;}
+
+function renderStats(){
+  document.getElementById('s-learned').textContent=WORDS.filter(isMastered).length;
+  document.getElementById('s-sessions').textContent=state.stats.sessions;
+  document.getElementById('s-flipped').textContent=state.stats.flipped;
+  document.getElementById('s-streak').textContent=state.stats.bestStreak||0;
+  const m=WORDS.filter(isMastered);
+  document.getElementById('mastered-list').innerHTML=m.length
+    ?m.map(w=>`<div class="word-item"><span style="font-family:'Lora',serif">${w.word}</span><span class="word-tag">${w.en.split('/')[0].trim()}</span></div>`).join('')
+    :'<div class="empty">Inga inlärda ord ännu — fortsätt spela!</div>';
+}
+
+function showScreen(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+n).classList.add('active');
+  const nb=document.getElementById('nav-'+n);if(nb)nb.classList.add('active');
+  if(n==='stats')renderStats();
+}
+
+loadState();
+if(apiKey){showScreen('play');startSession();}else{showScreen('setup');}
+</script>
+</body>
+</html>
