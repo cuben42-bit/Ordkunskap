@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ordkunskap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --border: #E4E0D8;
+    --text: #1A1814;
+    --muted: #8A8478;
+    --accent: #2C5F2E;
+    --accent-light: #EAF0EA;
+    --red: #8B2020;
+    --red-light: #F5EAEA;
+    --green1: #C8DDB0;
+    --green1-text: #2D5016;
+    --green2: #6A9E45;
+    --green2-text: #1E3A0F;
+    --green3: #2C5F2E;
+    --green3-text: #E8F2E8;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  header {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .logo {
+    font-family: 'Lora', serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .nav {
+    display: flex;
+    gap: 4px;
+    background: var(--border);
+    border-radius: 999px;
+    padding: 3px;
+  }
+
+  .nav-btn {
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .nav-btn.active {
+    background: var(--surface);
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .main {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* API KEY SETUP */
+  .setup-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+
+  .setup-card h2 {
+    font-family: 'Lora', serif;
+    font-size: 1.3rem;
+    margin-bottom: .5rem;
+  }
+
+  .setup-card p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+  }
+
+  .setup-card a { color: var(--accent); }
+
+  .api-input {
+    width: 100%;
+    padding: .75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--text);
+    margin-bottom: .75rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .api-input:focus { border-color: var(--accent); }
+
+  /* WORD CARD */
+  .word-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2.5rem 1.5rem 2rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+
+  .rep-badge {
+    display: inline-block;
+    font-size: 11px;
+    background: var(--accent-light);
+    color: var(--accent);
+    border-radius: 999px;
+    padding: 2px 10px;
+    margin-bottom: .75rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .the-word {
+    font-family: 'Lora', serif;
+    font-size: 2.5rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: .4rem;
+  }
+
+  .word-hint {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* TEXTAREA */
+  .answer-wrap { margin-bottom: .75rem; }
+
+  textarea {
+    width: 100%;
+    min-height: 90px;
+    padding: .85rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    background: var(--surface);
+    color: var(--text);
+    resize: none;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  textarea:focus { border-color: var(--accent); }
+
+  /* BUTTONS */
+  .btn-row { display: flex; gap: 8px; margin-bottom: .75rem; }
+
+  .btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn:active { transform: scale(0.98); }
+  .btn.skip { flex: .5; color: var(--muted); font-weight: 400; }
+  .btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .btn.primary:hover { background: #333; }
+
+  .score-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: .75rem; }
+
+  .score-btn {
+    padding: 11px 4px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .score-btn:active { transform: scale(0.97); }
+  .score-btn.s1 { background: var(--red-light); color: var(--red); }
+  .score-btn.s2 { background: var(--green1); color: var(--green1-text); }
+  .score-btn.s3 { background: var(--green2); color: var(--green2-text); }
+  .score-btn.s4 { background: var(--green3); color: var(--green3-text); }
+
+  /* FEEDBACK */
+  .feedback-section { margin-bottom: .75rem; }
+
+  .feedback-bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: .75rem;
+  }
+
+  .feedback-bubble.loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .feedback-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+
+  .feedback-text strong { font-weight: 600; }
+
+  .result-line {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: .5rem;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* FULL EXPLANATION */
+  .explain-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: .75rem;
+  }
+
+  .explain-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .explain-main {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .explain-syn {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .explain-ex {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .explain-langs {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* INTERVAL NOTE */
+  .interval-note {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: .5rem;
+  }
+
+  /* END SCREEN */
+  .end-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 3rem 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .end-num {
+    font-family: 'Lora', serif;
+    font-size: 4rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.04em;
+  }
+
+  .end-sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  /* STATS */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+  }
+
+  .stat-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .stat-val { font-family: 'Lora', serif; font-size: 1.75rem; font-weight: 600; }
+
+  .sec-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: .6rem;
+  }
+
+  .word-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem; }
+
+  .word-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .6rem 1rem;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .word-tag {
+    font-size: 11px;
+    background: var(--accent-light);
+    color: var(--accent);
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
+
+  .empty {
+    text-align: center;
+    padding: 2rem;
+    font-size: 13px;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+
+  /* API KEY footer */
+  .api-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .api-footer a {
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Ordkunskap</div>
+  <div class="nav">
+    <button class="nav-btn active" id="nav-play" onclick="showScreen('play')">Spela</button>
+    <button class="nav-btn" id="nav-stats" onclick="showScreen('stats')">Statistik</button>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- SETUP SCREEN -->
+  <div id="screen-setup" class="screen active">
+    <div class="setup-card">
+      <h2>Välkommen</h2>
+      <p>Ange din Anthropic API-nyckel för att aktivera AI-rättning. Nyckeln sparas bara lokalt i din webbläsare.<br><br>
+      Hämta en nyckel på <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+      <input type="password" class="api-input" id="api-key-input" placeholder="sk-ant-..." />
+      <button class="btn primary" style="width:100%" onclick="saveApiKey()">Starta spelet</button>
+    </div>
+  </div>
+
+  <!-- PLAY SCREEN -->
+  <div id="screen-play" class="screen">
+
+    <div id="phase-question">
+      <div class="word-card">
+        <div id="rep-badge" class="rep-badge" style="display:none">Repetition</div>
+        <div class="the-word" id="cur-word">—</div>
+        <div class="word-hint">Förklara vad ordet betyder</div>
+      </div>
+      <div class="answer-wrap">
+        <textarea id="user-answer" placeholder="Skriv din förklaring här..."></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn skip" onclick="skipWord()">Hoppa</button>
+        <button class="btn primary" onclick="submitAnswer()">Skicka svar</button>
+      </div>
+    </div>
+
+    <div id="phase-feedback" style="display:none">
+      <div class="word-card">
+        <div class="the-word" id="fb-word">—</div>
+      </div>
+
+      <div class="feedback-section">
+        <div class="feedback-bubble" id="feedback-bubble">
+          <div class="spinner"></div>
+          <span>Rättar ditt svar...</span>
+        </div>
+      </div>
+
+      <div class="explain-card" id="explain-card" style="display:none">
+        <div class="explain-label">Fullständig förklaring</div>
+        <div class="explain-main" id="ex-sv"></div>
+        <div class="explain-syn" id="ex-syn"></div>
+        <div class="explain-ex" id="ex-ex"></div>
+        <div class="explain-langs" id="ex-langs"></div>
+      </div>
+
+      <div id="score-section" style="display:none">
+        <div class="interval-note" id="interval-note"></div>
+        <div class="score-row">
+          <button class="score-btn s1" onclick="registerScore(1)">Fel</button>
+          <button class="score-btn s2" onclick="registerScore(2)">Delvis</button>
+          <button class="score-btn s3" onclick="registerScore(3)">Bra</button>
+          <button class="score-btn s4" onclick="registerScore(4)">Perfekt</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="phase-end" style="display:none">
+      <div class="end-card">
+        <div class="end-num" id="end-score">—</div>
+        <div class="end-sub">ord den här omgången</div>
+        <button class="btn primary" onclick="startSession()">Ny omgång</button>
+      </div>
+    </div>
+
+    <div class="api-footer">
+      <a onclick="resetApiKey()">Byt API-nyckel</a>
+    </div>
+  </div>
+
+  <!-- STATS SCREEN -->
+  <div id="screen-stats" class="screen">
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-label">Inlärda ord</div><div class="stat-val" id="s-learned">0</div></div>
+      <div class="stat-box"><div class="stat-label">Omgångar</div><div class="stat-val" id="s-sessions">0</div></div>
+      <div class="stat-box"><div class="stat-label">Vända kort</div><div class="stat-val" id="s-flipped">0</div></div>
+      <div class="stat-box"><div class="stat-label">Bästa streak</div><div class="stat-val" id="s-streak">0</div></div>
+    </div>
+    <div class="sec-title">Inlärda ord</div>
+    <div id="mastered-list" class="word-list"></div>
+  </div>
+
+</div>
+
+<script>
+const WORDS=[
+  {id:'w1',word:'förträfflig',sv:'Utmärkt och av yppersta slag — används när något överstiger det normalt förväntade. Bär en viss högtidlighet, passar bättre i skrift än vardagligt tal.',syn:'≈ Enastående, suverän, ypperlig',ex:['Det var en förträfflig middag.','Hon är en förträfflig lärare.','Resultatet blev förträffligt.'],en:'Excellent / outstanding',pl:'Doskonały / znakomity'},
+  {id:'w2',word:'vederhäftig',sv:'Trovärdig, pålitlig och väl underbyggd. Man kan lita på det som sägs för att det bygger på fakta. Motsats: oseriös, opålitlig.',syn:'≈ Tillförlitlig, trovärdig, seriös',ex:['En vederhäftig källa.','Hans redogörelse var vederhäftig.','Journalisten kontrollerar sina vederhäftiga fakta.'],en:'Credible / reliable',pl:'Wiarygodny / rzetelny'},
+  {id:'w3',word:'motstridig',sv:'När saker säger emot varandra och inte kan stämma samtidigt. Används om uppgifter, vittnesmål eller känslor som pekar i olika riktningar.',syn:'≈ Motsägelsefull, oförenlig, inkonsekvent',ex:['Vittnesmålen var motstridiga.','Han hade motstridiga känslor.','Rapporten innehåller motstridiga uppgifter.'],en:'Contradictory / conflicting',pl:'Sprzeczny / niezgodny'},
+  {id:'w4',word:'reciprok',sv:'Ömsesidig och symmetrisk — gäller i båda riktningar. Används i formella, juridiska och matematiska sammanhang.',syn:'≈ Ömsesidig, bilateral, symmetrisk',ex:['Ett reciprokt handelsavtal.','Kärlek är mer meningsfull när den är reciprok.','Matematiken använder reciproka värden (1/x).'],en:'Reciprocal / mutual',pl:'Wzajemny / obustronny'},
+  {id:'w5',word:'egendomlig',sv:'Märklig och avvikande från det normala — utan att vara direkt skrämmande. Starkare än "konstig", mjukare än "bisarr". Signalerar undran.',syn:'≈ Underlig, sällsam, besynnerlig',ex:['En egendomlig känsla.','Hon hade ett egendomligt sätt att skratta.','En egendomlig händelse inträffade.'],en:'Strange / peculiar',pl:'Dziwny / osobliwy'},
+  {id:'w6',word:'obeveklig',sv:'Absolut orubblig — låter sig inte påverkas, mjukas upp eller stoppas. Kan gälla en person, kraft eller process. Dramatisk och ödesdigger ton.',syn:'≈ Orubblig, kompromisslös, hänsynslös',ex:['Han var obeveklig i sin vägran.','Tidens gång är obeveklig.','Den obevekliga domaren lät sig inte blidkas.'],en:'Relentless / inexorable',pl:'Nieugięty / bezlitosny'},
+  {id:'w7',word:'svårmod',sv:'Djup, tyst och ihållande känsla av vemod — mer poetisk än "depression". Handlar om ett inre tungsinne, inte nödvändigtvis med yttre orsak.',syn:'≈ Melankoli, vemod, tungsinne',ex:['Svårmod lade sig över honom på hösten.','Hennes musik genomsyrades av ett skönt svårmod.','Han försökte skaka av sig svårmodet.'],en:'Melancholy / gloom',pl:'Melancholia / przygnębienie'},
+  {id:'w8',word:'förtegen',sv:'Avsiktligt tystlåten — avslöjar inte mer än nödvändigt, av försiktighet eller hemlighetsmakeri. En vald tystnad, inte oförmåga att tala.',syn:'≈ Hemlighetsfull, reserverad, sluten',ex:['Hon var förtegen om sin bakgrund.','Han förblev förtegen under förhöret.','En förtegen diplomat avslöjar inga planer.'],en:'Reticent / tight-lipped',pl:'Małomówny / skryty'},
+  {id:'w9',word:'inbillsk',sv:'Uppblåst och ogrundad uppfattning om sig själv. Starkare och mer negativt än "självsäker" — en fåfänga som stöter bort andra.',syn:'≈ Högdragen, självgod, fåfäng',ex:['Han var så inbillsk att han aldrig lyssnade.','En inbillsk person tar sällan hänsyn till andra.','Hennes inbillska attityd gjorde henne impopulär.'],en:'Conceited / vain',pl:'Zarozumiały / próżny'},
+  {id:'w10',word:'försynt',sv:'Blygsam, varsam och respektfull — tar inte för sig mer än nödvändigt, undviker att störa. Positiv egenskap som signalerar takt och hänsyn.',syn:'≈ Återhållsam, anspråkslös, diskret',ex:['Han ställde frågan försynt.','Hon knackade försynt på dörren.','En försynt kommentar kan vara mer effektiv.'],en:'Modest / discreet',pl:'Skromny / delikatny'},
+  {id:'w11',word:'ominös',sv:'Ger stark känsla av att något dåligt är på väg — hotfull stämning som hänger i luften. Mer litterärt än "farligt".',syn:'≈ Olycksbådande, illavarslande, hotfull',ex:['En ominös tystnad föll över rummet.','Det ominösa molnet varslade om storm.','Hans leende var ominöst.'],en:'Ominous / foreboding',pl:'Złowieszczy / groźny'},
+  {id:'w12',word:'sinnelag',sv:'Den djupare, stabila grunden i en persons karaktär — hur man i grunden förhåller sig till andra och världen. Mer bestående än humör.',syn:'≈ Naturell, läggning, mentalitet',ex:['Han har ett generöst sinnelag.','Hennes sinnelag är optimistiskt.','Det krävs ett tålmodigt sinnelag för att jobba med barn.'],en:'Disposition / temperament',pl:'Usposobienie / charakter'},
+  {id:'w13',word:'arrogera',sv:'Ta sig rätten till något utan befogenhet — en makthandling utan legitimitet. Formellt och juridiskt laddat, ovanligt i vardagsspråk.',syn:'≈ Usurpera, tillägna sig, bemäktiga sig',ex:['Generalen arrogerade sig statsmakten.','Han arrogerade sig rätten att tala för gruppen.','Ingen kan arrogera sig sådana befogenheter.'],en:'To arrogate / usurp',pl:'Uzurpować sobie'},
+  {id:'w14',word:'tillnyktring',sv:'Bli nykter igen — bokstavligt eller bildligt om uppvaknande från illusion. Innebär en nyktrare, mer realistisk blick.',syn:'≈ Ernyktrande, desillusionering, uppvaknande',ex:['En politisk tillnyktring efter krisen.','Tillnyktringens tystnad kom efter festen.','Samhällets tillnyktring efter kriget.'],en:'Sobering up / disillusionment',pl:'Otrzeźwienie / rozczarowanie'},
+  {id:'w15',word:'reciprocitet',sv:'Principen om ömsesidighet — förmåner och skyldigheter ska gå i båda riktningar. Grundläggande i diplomati, avtal och sociala normer.',syn:'≈ Ömsesidighet, jämvikt, symmetri',ex:['Diplomatin bygger på reciprocitet.','Det saknas reciprocitet i deras relation.','Avtalet garanterar reciprocitet i handeln.'],en:'Reciprocity / mutuality',pl:'Wzajemność'},
+];
+
+const INTERVALS={4:[0,10,30,90,180],3:[0,5,14,45],2:[0,3,7],1:[0,1,3]};
+const MASTER_AT=4;
+const STORAGE_KEY='ordkunskap-app-v1';
+
+let state={progress:{},stats:{learned:0,sessions:0,flipped:0,bestStreak:0},streak:0};
+let session=[],idx=0,sessionCorrect=0;
+let apiKey='';
+
+function loadState(){
+  try{
+    const s=localStorage.getItem(STORAGE_KEY);
+    if(s) state=JSON.parse(s);
+    apiKey=localStorage.getItem('ordkunskap-apikey')||'';
+  }catch(e){}
+}
+
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
+}
+
+function saveApiKey(){
+  const k=document.getElementById('api-key-input').value.trim();
+  if(!k.startsWith('sk-')){alert('Ange en giltig API-nyckel (börjar med sk-)');return;}
+  apiKey=k;
+  localStorage.setItem('ordkunskap-apikey',k);
+  showScreen('play');
+  startSession();
+}
+
+function resetApiKey(){
+  localStorage.removeItem('ordkunskap-apikey');
+  apiKey='';
+  showScreen('setup');
+}
+
+function getMastered(){return WORDS.filter(w=>(state.progress[w.id]?.bestScore||0)>=MASTER_AT);}
+function isDue(w){const p=state.progress[w.id];if(!p||!p.nextReview)return true;return Date.now()>=p.nextReview;}
+function buildSession(){const due=WORDS.filter(isDue).sort(()=>Math.random()-.5);return due.length?due.slice(0,10):WORDS.sort(()=>Math.random()-.5).slice(0,10);}
+
+function startSession(){
+  session=buildSession();idx=0;sessionCorrect=0;
+  state.stats.sessions++;
+  showPhase('question');
+  showWord();
+  saveState();
+}
+
+function showPhase(name){
+  ['question','feedback','end'].forEach(p=>{
+    document.getElementById('phase-'+p).style.display=p===name?'':'none';
+  });
+}
+
+function showWord(){
+  if(idx>=session.length){endSession();return;}
+  const w=session[idx];
+  const p=state.progress[w.id];
+  document.getElementById('cur-word').textContent=w.word;
+  document.getElementById('rep-badge').style.display=(p&&(p.bestScore||0)>=MASTER_AT)?'inline-block':'none';
+  document.getElementById('user-answer').value='';
+  showPhase('question');
+  document.getElementById('user-answer').focus();
+}
+
+async function submitAnswer(){
+  const ans=document.getElementById('user-answer').value.trim();
+  if(!ans) return;
+  const w=session[idx];
+  state.stats.flipped++;
+
+  document.getElementById('fb-word').textContent=w.word;
+  document.getElementById('explain-card').style.display='none';
+  document.getElementById('score-section').style.display='none';
+  document.getElementById('feedback-bubble').innerHTML='<div class="spinner"></div><span>Rättar ditt svar...</span>';
+  document.getElementById('feedback-bubble').className='feedback-bubble loading';
+  showPhase('feedback');
+
+  const prompt=`Du rättar svenska ordkunskapsövningar. Börja alltid med "Resultat: **[Fel / Delvis / Bra / Perfekt]**" på första raden. Betygsätt själv. Ge sedan den absolut bästa förklaringen anpassad efter elevens svar — vad stämde, vad saknades, ordets viktigaste nyans. Max 3 meningar. Inga hälsningar eller avslutningar.
+
+Ord: "${w.word}"
+Betydelse: ${w.sv}
+Synonymer: ${w.syn}
+Exempel: ${w.ex.join(' / ')}
+Elevens svar: "${ans}"`;
+
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':apiKey,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:300,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+
+    const data=await res.json();
+    if(data.error){throw new Error(data.error.message);}
+    const text=data.content.map(c=>c.text||'').join('');
+
+    const formatted=text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    document.getElementById('feedback-bubble').innerHTML=`<div class="feedback-text">${formatted}</div>`;
+    document.getElementById('feedback-bubble').className='feedback-bubble';
+
+  } catch(e){
+    document.getElementById('feedback-bubble').innerHTML=`<div class="feedback-text" style="color:var(--red)">Något gick fel: ${e.message}</div>`;
+    document.getElementById('feedback-bubble').className='feedback-bubble';
+  }
+
+  document.getElementById('ex-sv').textContent=w.sv;
+  document.getElementById('ex-syn').textContent=w.syn;
+  document.getElementById('ex-ex').innerHTML=w.ex.map(e=>`${e}`).join('<br>');
+  document.getElementById('ex-langs').textContent=w.en+' · '+w.pl;
+  document.getElementById('explain-card').style.display='block';
+  document.getElementById('score-section').style.display='block';
+  saveState();
+}
+
+function registerScore(score){
+  const w=session[idx];
+  const p=state.progress[w.id]||{correct:0,bestScore:0,reviewCount:0};
+  p.reviewCount=(p.reviewCount||0)+1;
+  if(score>=3){p.correct=(p.correct||0)+1;sessionCorrect++;state.streak=(state.streak||0)+1;}
+  else{p.correct=Math.max(0,(p.correct||0)-1);state.streak=0;}
+  if(score>(p.bestScore||0))p.bestScore=score;
+  const intervals=INTERVALS[score]||INTERVALS[1];
+  const step=Math.min(p.reviewCount-1,intervals.length-1);
+  const days=intervals[step];
+  p.nextReview=Date.now()+days*86400000;
+  state.progress[w.id]=p;
+  state.stats.learned=getMastered().length;
+  if(state.streak>(state.stats.bestStreak||0))state.stats.bestStreak=state.streak;
+  saveState();
+  idx++;
+  showWord();
+}
+
+function skipWord(){idx++;showWord();}
+
+function endSession(){
+  showPhase('end');
+  document.getElementById('end-score').textContent=sessionCorrect+'/'+session.length;
+}
+
+function renderStats(){
+  document.getElementById('s-learned').textContent=getMastered().length;
+  document.getElementById('s-sessions').textContent=state.stats.sessions;
+  document.getElementById('s-flipped').textContent=state.stats.flipped;
+  document.getElementById('s-streak').textContent=state.stats.bestStreak||0;
+  const m=getMastered();
+  document.getElementById('mastered-list').innerHTML=m.length
+    ?m.map(w=>`<div class="word-item"><span style="font-family:'Lora',serif">${w.word}</span><span class="word-tag">${w.en.split('/')[0].trim()}</span></div>`).join('')
+    :'<div class="empty">Inga inlärda ord ännu — fortsätt spela!</div>';
+}
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  const navBtn=document.getElementById('nav-'+name);
+  if(navBtn) navBtn.classList.add('active');
+  if(name==='stats') renderStats();
+}
+
+// INIT
+loadState();
+if(apiKey){
+  showScreen('play');
+  startSession();
+} else {
+  showScreen('setup');
+}
+</script>
+</body>
+</html>
